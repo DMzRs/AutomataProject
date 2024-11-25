@@ -3,6 +3,6 @@ module icedcoffee.automatatheory {
     requires javafx.fxml;
 
 
-    opens icedcoffee.automatatheory to javafx.fxml;
-    exports icedcoffee.automatatheory;
+    opens automatatheory to javafx.fxml;
+    exports automatatheory;
 }
