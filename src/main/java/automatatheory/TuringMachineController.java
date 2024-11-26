@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -35,6 +36,9 @@ public class TuringMachineController {
     private HBox inputTape;
 
     @FXML
+    private VBox tapeBox;
+
+    @FXML
     private TextArea transitionLog;
 
     @FXML
@@ -56,13 +60,6 @@ public class TuringMachineController {
     private int currentPos = 0; // Position of the tape head
     private int currentState = 0; // Current state
 
-    private final String[] states = {"right", "carry", "done"};
-    private final String[] transitions = {
-            "1, 0 -> R",
-            "1, 0 -> L",
-            "1, 0 -> L"
-    };
-
     private boolean isHalted = false;
     private boolean isRunning = false;
     private Timeline timeline;
@@ -83,30 +80,22 @@ public class TuringMachineController {
             int num1 = Integer.parseInt(number1Field.getText());
             int num2 = Integer.parseInt(number2Field.getText());
 
-            int result = 0;
-            if (operation.equals("addition")) {
-                result = num1 + num2;
-            } else if (operation.equals("subtraction")) {
-                result = num1 - num2;
-            }
+            int result = operation.equals("addition") ? num1 + num2 : num1 - num2;
 
-            String binaryResult = toBinary(result);
             String binaryNum1 = toBinary(num1);
             String binaryNum2 = toBinary(num2);
+            String binaryResult = toBinary(result);
 
             resultLabel.setText("Result: " + result);
             binaryResultLabel.setText("Binary: " + binaryResult);
-            binaryConversionMessage.setText("All numbers converted to binary");
+            binaryConversionMessage.setText("No conversion yet");
 
-            // Initialize tape based on the largest binary number
-            int maxLength = Math.max(binaryNum1.length(), Math.max(binaryNum2.length(), binaryResult.length()));
-            tape = new String[maxLength + 2]; // +2 for overflow space
-            for (int i = 0; i < tape.length; i++) {
-                tape[i] = "_";
-            }
-
-            // Update tape with binary numbers
-            updateTape(binaryNum1, binaryNum2, binaryResult);
+            // Initialize tape with binary numbers and halt marker
+            tape = createTape(binaryNum1, binaryNum2, binaryResult);
+            currentPos = 0; // Reset tape head position
+            currentState = 0; // Reset state
+            isHalted = false;
+            updateTape();
 
         } catch (NumberFormatException e) {
             resultLabel.setText("Error: Please enter valid numbers.");
@@ -116,35 +105,38 @@ public class TuringMachineController {
     }
 
     private String toBinary(int number) {
-        if (number == 0) {
-            return "0";
-        }
-        StringBuilder binary = new StringBuilder();
-        int num = Math.abs(number);
-        while (num > 0) {
-            binary.append(num % 2);
-            num /= 2;
-        }
-        if (number < 0) {
-            binary.append("-");
-        }
-        return binary.reverse().toString();
+        return Integer.toBinaryString(number);
     }
 
-    private void updateTape(String binaryNum1, String binaryNum2, String binaryResult) {
+    private String[] createTape(String binaryNum1, String binaryNum2, String binaryResult) {
+        // Combine inputs, result, and halt marker into the tape
+        String tapeContent = binaryNum1 + "_" + binaryNum2 + "_" + binaryResult + "_Δ";
+        return tapeContent.split("");
+    }
+
+    private void updateTape() {
         inputTape.getChildren().clear();
 
         for (int i = 0; i < tape.length; i++) {
+            VBox cellBox = new VBox();
+
             Label tapeCell = new Label(tape[i]);
             tapeCell.setStyle("-fx-border-color: black; -fx-padding: 10; -fx-background-color: white;");
+
             if (i == currentPos) {
                 tapeCell.setStyle("-fx-border-color: black; -fx-padding: 10; -fx-background-color: yellow;");
             }
-            inputTape.getChildren().add(tapeCell);
-        }
 
-        Text currentStateText = new Text("Current State: " + states[currentState]);
-        inputTape.getChildren().add(currentStateText);
+            Text stateIndicator = new Text();
+            if (i == currentPos) {
+                stateIndicator.setText("q" + currentState);
+            }
+
+            cellBox.getChildren().addAll(tapeCell, stateIndicator);
+            cellBox.setSpacing(5);
+            cellBox.setStyle("-fx-alignment: center;");
+            inputTape.getChildren().add(cellBox);
+        }
     }
 
     private void stepTransition() {
@@ -153,45 +145,58 @@ public class TuringMachineController {
             return;
         }
 
-        transitionLog.appendText("State: " + states[currentState] + "\n");
-        transitionLog.appendText("Transition: " + transitions[currentState] + "\n");
+        transitionLog.appendText("Processing tape index: " + currentPos + "\n");
 
-        switch (states[currentState]) {
-            case "right":
-                if (currentPos < tape.length - 1) {
-                    currentPos++;
-                } else {
-                    transitionLog.appendText("Tape head reached the end.\n");
-                    isHalted = true;
-                    stopMachine();
-                    return;
-                }
-                break;
-            case "carry":
-                // Logic for carry
-                break;
-            case "done":
-                transitionLog.appendText("Machine halted in state 'done'.\n");
-                isHalted = true;
-                stopMachine();
-                return;
+        // Check if the current tape cell is the halt marker (Δ)
+        if (tape[currentPos].equals("Δ")) {
+            isHalted = true;
+            transitionLog.appendText("Machine halted.\n");
+
+            // Stop the timeline if halt state is reached
+            if (timeline != null) {
+                timeline.stop();
+            }
+
+            // Update binary conversion message after halting
+            binaryConversionMessage.setText("All numbers converted to binary");
+            return;
         }
 
-        currentState = (currentState + 1) % states.length;
-        updateTape("", "", "");
+        // Move to the next position on the tape
+        if (currentPos < tape.length - 1) {
+            currentPos++;
+            currentState++; // Example state change (you can modify logic)
+        } else {
+            isHalted = true;
+            transitionLog.appendText("Machine halted.\n");
+
+            // Stop the timeline when halt state is reached
+            if (timeline != null) {
+                timeline.stop();
+            }
+
+            // Update binary conversion message after halting
+            binaryConversionMessage.setText("All numbers converted to binary");
+        }
+
+        updateTape();
     }
 
     private void runMachine() {
         if (isHalted) {
-            return;
+            return; // If already halted, do nothing
         }
 
         if (!isRunning) {
             isRunning = true;
             timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-                stepTransition();
+                if (!isHalted) {
+                    stepTransition();  // Call stepTransition on each step
+                }
                 if (isHalted) {
                     transitionLog.appendText("Halt (Δ)\n");
+                    // Update binary conversion message after halting
+                    binaryConversionMessage.setText("All numbers converted to binary");
                 }
             }));
             timeline.setCycleCount(Timeline.INDEFINITE);
@@ -215,7 +220,7 @@ public class TuringMachineController {
         currentPos = 0;
         isHalted = false;
         transitionLog.clear();
-        updateTape("", "", "");
+        updateTape();
     }
 
     private void skipToHalt() {
