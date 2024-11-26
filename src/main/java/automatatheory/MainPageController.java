@@ -14,7 +14,7 @@ public class MainPageController {
     @FXML
     protected void enterTuringMachine() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainPage.class.getResource("TuringMachine.fxml"));
-        Scene turingMachine = new Scene(fxmlLoader.load(), 800, 600);
+        Scene turingMachine = new Scene(fxmlLoader.load(), 1001, 674);
 
         Stage currentStage = (Stage) turingMachLabel.getScene().getWindow();
         currentStage.setTitle("Turing Machine Page");

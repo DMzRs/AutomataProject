@@ -1,25 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Pos?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-radius: 22px;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="automatatheory.TuringMachineController">
-   <children>
-      <Pane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #99daba; -fx-border-color: #095559; -fx-border-width: 10px; -fx-background-radius: 7px;">
-         <children>
-            <Label alignment="CENTER" layoutX="14.0" layoutY="567.0" text="By: Mendoza" textAlignment="CENTER" textFill="#095559">
-               <font>
-                  <Font name="Franklin Gothic Medium" size="16.0" />
-               </font>
-            </Label>
-            <Label alignment="CENTER" layoutX="236.0" layoutY="31.0" text="TURING MACHINE" textAlignment="CENTER" textFill="#095559">
-               <font>
-                  <Font name="Franklin Gothic Medium" size="43.0" />
-               </font>
-            </Label>
-         </children>
-      </Pane>
-   </children>
-</AnchorPane>
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="automatatheory.TuringMachineController"
+      alignment="CENTER"
+      spacing="10"
+      style="-fx-background-color: #99daba; -fx-padding: 20; -fx-border-color: #008080; -fx-border-width: 5px; -fx-border-radius: 10px; -fx-background-radius: 10px;">
+   <!-- Title Label -->
+   <Label text="Turing Machine" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #004d4d;" />
+
+   <!-- Input Fields -->
+   <HBox spacing="10" alignment="CENTER">
+      <TextField fx:id="number1Field" promptText="Number 1" style="-fx-background-color: #f0ffff; -fx-border-color: #00cccc; -fx-border-radius: 5px;" />
+      <TextField fx:id="number2Field" promptText="Number 2" style="-fx-background-color: #f0ffff; -fx-border-color: #00cccc; -fx-border-radius: 5px;" />
+   </HBox>
+
+   <!-- Operation Buttons -->
+   <HBox spacing="10" alignment="CENTER">
+      <Button fx:id="additionButton" text="Add" style="-fx-background-color: #008080; -fx-text-fill: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+      <Button fx:id="subtractionButton" text="Subtract" style="-fx-background-color: #008080; -fx-text-fill: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+   </HBox>
+
+   <!-- Result Labels -->
+   <Label fx:id="resultLabel" text="Result: " style="-fx-font-size: 14px; -fx-text-fill: #004d4d;" />
+   <Label fx:id="binaryResultLabel" text="Binary: " style="-fx-font-size: 14px; -fx-tzext-fill: #004d4d;" />
+
+   <!-- Binary Conversion Message -->
+   <Label fx:id="binaryConversionMessage" text="No conversion yet" style="-fx-font-style: italic; -fx-text-fill: #008080;" />
+
+   <!-- Input Tape Display -->
+   <HBox fx:id="inputTape" spacing="5" alignment="CENTER" style="-fx-padding: 10; -fx-border-color: #00cccc; -fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+
+   <!-- Transition Log -->
+   <TextArea fx:id="transitionLog" editable="false" prefHeight="150" prefWidth="400" style="-fx-background-color: #f0ffff; -fx-border-color: #00cccc; -fx-border-radius: 5px;" />
+
+   <!-- Control Buttons -->
+   <HBox spacing="10" alignment="CENTER">
+      <Button fx:id="stepButton" text="Step" style="-fx-background-color: #008080; -fx-text-fill: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+      <Button fx:id="runButton" text="Run" style="-fx-background-color: #008080; -fx-text-fill: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+      <Button fx:id="pauseButton" text="Pause" style="-fx-background-color: #008080; -fx-text-fill: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+      <Button fx:id="stopButton" text="Stop" style="-fx-background-color: #008080; -fx-text-fill: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+      <Button fx:id="skipButton" text="Skip to Halt" style="-fx-background-color: #008080; -fx-text-fill: white; -fx-border-radius: 5px; -fx-background-radius: 5px;" />
+   </HBox>
+</VBox>
